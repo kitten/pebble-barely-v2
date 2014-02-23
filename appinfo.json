@@ -1,0 +1,16 @@
+{
+  "uuid": "6e249c95-ea9a-4c29-84a2-1947802478a5",
+  "shortName": "Barely V2",
+  "longName": "Barely V2",
+  "companyName": "Phil Plueckthun",
+  "versionCode": 1,
+  "versionLabel": "1.0.0",
+  "capabilities": [ "configurable" ],
+  "watchapp": {
+    "watchface": true
+  },
+  "appKeys": {},
+  "resources": {
+    "media": []
+  }
+}
