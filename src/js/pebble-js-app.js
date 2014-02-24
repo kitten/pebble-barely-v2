@@ -8,7 +8,7 @@ Pebble.addEventListener("ready", function() {
 Pebble.addEventListener("showConfiguration", function() {
 	console.log("showing configuration");
 	
-	var url = 'http://plckthn.me/pebble/barely/configure.html?';
+	var url = 'http://plckthn.me/pebble/barely/configure-v2.html?';
 	var firstParam = true;
 	
 	for(var i = 0, x = localStorage.length; i < x; i++) {
@@ -37,7 +37,10 @@ Pebble.addEventListener("webviewclosed", function(e) {
 		}
 		console.log("Trace: Options Recorded - " + JSON.stringify(options));
 
-		var dict = { 0: options.KEY_INVERTED };
+		var dict = { 
+			0: options.KEY_INVERTED,
+			1: options.KEY_MMDD
+		};
 		console.log("Trace: Dict Sending - " + JSON.stringify(dict));
 
 		Pebble.sendAppMessage(dict, 

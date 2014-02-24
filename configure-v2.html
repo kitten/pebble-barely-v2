@@ -23,6 +23,14 @@
             <option value="on">On</option>
           </select>
         </div>
+		
+        <div data-role="fieldcontain">
+          <label for="KEY_MMDD">Month Before Day (MM-DD)</label>
+          <select name="KEY_MMDD" id="KEY_MMDD" data-role="slider">
+            <option value="off">Off</option>
+            <option value="on">On</option>
+          </select>
+        </div>
 
         <div class="ui-body ui-body-b">
           <fieldset class="ui-grid-a">
@@ -36,7 +44,8 @@
     <script>
       function saveOptions() {
         var options = {
-          'KEY_INVERTED': $("#KEY_INVERTED").val()
+          'KEY_INVERTED': $("#KEY_INVERTED").val(),
+		  'KEY_MMDD': $("#KEY_MMDD").val()
         }
         return options;
       }

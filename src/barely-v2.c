@@ -1,10 +1,12 @@
 #include <pebble.h>
 
 enum {
-	KEY_INVERTED = 0
+	KEY_INVERTED = 0,
+	KEY_MMDD = 1
 };
 
 #define PERSIST_INVERTED 1
+#define PERSIST_MMDD 2
 
 static Window *window;
 static Layer *canvas;
@@ -12,6 +14,7 @@ static Layer *canvas;
 static Layer *digit[12];
 int displayDigit[12];
 bool isInverted = false;
+bool isMMDD = false;
 
 static unsigned short get_display_hour(unsigned short hour) {
 	if (clock_is_24h_style()) {
@@ -125,6 +128,54 @@ void process_tuple(Tuple *t) {
 		for(int i = 0; i < 12; i++) {
 			layer_mark_dirty(digit[i]);
 		}
+	} else if (key == KEY_MMDD) {
+		if (strcmp(string_value, "on") == 0) {
+			isMMDD = true;
+		} else {
+			isMMDD = false;
+		}
+		
+		struct tm *tick_time;
+		time_t temp = time(NULL);
+		tick_time = localtime(&temp);
+		
+		int day = tick_time->tm_mday;
+		int month = tick_time->tm_mon + 1;
+		if (isMMDD) {
+			if (displayDigit[5] != month % 10) {
+				displayDigit[5] = month % 10;
+				layer_mark_dirty(digit[7]);
+			}
+			if (displayDigit[4] != month / 10 % 10) {
+				displayDigit[4] = month / 10 % 10;
+				layer_mark_dirty(digit[6]);
+			}
+			if (displayDigit[7] != day % 10) {
+				displayDigit[7] = day % 10;
+				layer_mark_dirty(digit[5]);
+			}
+			if (displayDigit[6] != day / 10 % 10) {
+				displayDigit[6] = day / 10 % 10;
+				layer_mark_dirty(digit[4]);
+			}
+		} else {
+			if (displayDigit[5] != day % 10) {
+				displayDigit[5] = day % 10;
+				layer_mark_dirty(digit[5]);
+			}
+			if (displayDigit[4] != day / 10 % 10) {
+				displayDigit[4] = day / 10 % 10;
+				layer_mark_dirty(digit[4]);
+			}
+			if (displayDigit[7] != month % 10) {
+				displayDigit[7] = month % 10;
+				layer_mark_dirty(digit[7]);
+			}
+			if (displayDigit[6] != month / 10 % 10) {
+				displayDigit[6] = month / 10 % 10;
+				layer_mark_dirty(digit[6]);
+			}	
+		}
 	}
 }
 
@@ -163,21 +214,40 @@ void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
 	
 	int day = tick_time->tm_mday;
 	int month = tick_time->tm_mon + 1;
-	if (displayDigit[5] != day % 10) {
-		displayDigit[5] = day % 10;
-		layer_mark_dirty(digit[5]);
-	}
-	if (displayDigit[4] != day / 10 % 10) {
-		displayDigit[4] = day / 10 % 10;
-		layer_mark_dirty(digit[4]);
-	}
-	if (displayDigit[7] != month % 10) {
-		displayDigit[7] = month % 10;
-		layer_mark_dirty(digit[7]);
-	}
-	if (displayDigit[6] != month / 10 % 10) {
-		displayDigit[6] = month / 10 % 10;
-		layer_mark_dirty(digit[6]);
+	if (isMMDD) {
+		if (displayDigit[5] != month % 10) {
+			displayDigit[5] = month % 10;
+			layer_mark_dirty(digit[7]);
+		}
+		if (displayDigit[4] != month / 10 % 10) {
+			displayDigit[4] = month / 10 % 10;
+			layer_mark_dirty(digit[6]);
+		}
+		if (displayDigit[7] != day % 10) {
+			displayDigit[7] = day % 10;
+			layer_mark_dirty(digit[5]);
+		}
+		if (displayDigit[6] != day / 10 % 10) {
+			displayDigit[6] = day / 10 % 10;
+			layer_mark_dirty(digit[4]);
+		}
+	} else {
+		if (displayDigit[5] != day % 10) {
+			displayDigit[5] = day % 10;
+			layer_mark_dirty(digit[5]);
+		}
+		if (displayDigit[4] != day / 10 % 10) {
+			displayDigit[4] = day / 10 % 10;
+			layer_mark_dirty(digit[4]);
+		}
+		if (displayDigit[7] != month % 10) {
+			displayDigit[7] = month % 10;
+			layer_mark_dirty(digit[7]);
+		}
+		if (displayDigit[6] != month / 10 % 10) {
+			displayDigit[6] = month / 10 % 10;
+			layer_mark_dirty(digit[6]);
+		}	
 	}
 	
 	int year = tick_time->tm_year + 1900;
@@ -207,6 +277,7 @@ void handle_init(void) {
 	app_message_open(512, 512);
 	
 	isInverted = persist_exists(PERSIST_INVERTED) ? persist_read_bool(PERSIST_INVERTED) : false;
+	isMMDD = persist_exists(PERSIST_MMDD) ? persist_read_bool(PERSIST_MMDD) : false;
 	
 	if (isInverted) {
 		window_set_background_color(window, GColorBlack);
@@ -235,17 +306,32 @@ void handle_init(void) {
 	
 	int day = tick_time->tm_mday;
 	int month = tick_time->tm_mon + 1;
-	if (displayDigit[5] != day % 10) {
-		displayDigit[5] = day % 10;
-	}
-	if (displayDigit[4] != day / 10 % 10) {
-		displayDigit[4] = day / 10 % 10;
-	}
-	if (displayDigit[7] != month % 10) {
-		displayDigit[7] = month % 10;
-	}
-	if (displayDigit[6] != month / 10 % 10) {
-		displayDigit[6] = month / 10 % 10;
+	if (isMMDD) {
+		if (displayDigit[5] != month % 10) {
+			displayDigit[5] = month % 10;
+		}
+		if (displayDigit[4] != month / 10 % 10) {
+			displayDigit[4] = month / 10 % 10;
+		}
+		if (displayDigit[7] != day % 10) {
+			displayDigit[7] = day % 10;
+		}
+		if (displayDigit[6] != day / 10 % 10) {
+			displayDigit[6] = day / 10 % 10;
+		}
+	} else {
+		if (displayDigit[5] != day % 10) {
+			displayDigit[5] = day % 10;
+		}
+		if (displayDigit[4] != day / 10 % 10) {
+			displayDigit[4] = day / 10 % 10;
+		}
+		if (displayDigit[7] != month % 10) {
+			displayDigit[7] = month % 10;
+		}
+		if (displayDigit[6] != month / 10 % 10) {
+			displayDigit[6] = month / 10 % 10;
+		}	
 	}
 	
 	int year = tick_time->tm_year + 1900;
@@ -319,6 +405,7 @@ void handle_deinit(void) {
 	tick_timer_service_unsubscribe();
 	window_destroy(window);
 	persist_write_bool(PERSIST_INVERTED, isInverted);
+	persist_write_bool(PERSIST_MMDD, isMMDD);
 }
 
 int main(void) {
